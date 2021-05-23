@@ -579,7 +579,7 @@ function client_certificate_permissions {
   sudo chmod u+rX,g+rX,o-rwx $deadline_client_certificates_location
 
   sudo chown $deadlineuser_name:$deadlineuser_name $deadline_client_certificates_location/*
-  sudo chmod u=wr,g=r,o-rwx $deadline_client_certificates_location/*
+  sudo chmod u=wrX,g=r,o-rwx $deadline_client_certificates_location/*
   sudo chmod u=wr,g=r,o=r "${deadline_client_certificates_location}/ca.crt"
   sudo chmod u=rw,g=r,o-rwx "${deadline_client_certificates_location}/${deadline_proxy_certificate_basename}.pfx"
   sudo chmod u=rw,g=r,o-rwx "${deadline_client_certificates_location}/${server_cert_basename}.pfx"
