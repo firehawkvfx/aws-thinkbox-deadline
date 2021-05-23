@@ -978,7 +978,7 @@ function options { # Not all defaults are available as args, however the script 
     configure_deadline "$deadline_proxy_root_dir" "$deadline_certificates_location" "$deadline_client_certificate" "$deadline_client_certificates_location" "$deadline_proxy_certificate" "$license_forwarder"
   fi
 
-  printf "\nlicense_forwarder: $license_forwarder\n\n"
+  log_info "\n...license_forwarder: $license_forwarder\n\n"
   if [[ "$license_forwarder" != "none" ]]; then
     ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchLicenseForwarderAtStartup=" "1"
     ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LicenseForwarderSSLPath=" "$license_forwarder"
