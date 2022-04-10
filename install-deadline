@@ -183,47 +183,51 @@ function download_mongo {
 }
 
 function download_deadline {
-  local -r deadline_linux_installers_tar="$1"
-  local -r deadline_version="$2"
-  local -r deadline_linux_installers_filename="$3"
+  local -r deadline_installers_tar="$1"
+  local -r deadline_installer_bucket_key="$2"
+  local -r deadline_installers_filename="$3"
   local -r installers_bucket="$4"
   local -r deadline_installer_dir="$5"
+  local -r extract_installer="$6"
 
-  if [[ ! -d "$(dirname $deadline_linux_installers_tar)" ]]; then
+  if [[ ! -d "$(dirname $deadline_installers_tar)" ]]; then
     log_info "Ensuring dir exists for installers."
-    mkdir -p  "$(dirname $deadline_linux_installers_tar)"
+    mkdir -p  "$(dirname $deadline_installers_tar)"
   fi
 
-  if [[ -f "$deadline_linux_installers_tar" ]]; then
-      log_info "File already exists: $deadline_linux_installers_tar"
+  if [[ -f "$deadline_installers_tar" ]]; then
+      log_info "File already exists: $deadline_installers_tar"
   else
       # Prefer installation from Thinkbox S3 Bucket for visibility when a version is deprecated.
-      output=$(aws s3api head-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_filename}") && exit_status=0 || exit_status=$?
+      output=$(aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "...Downloading Deadline from: thinkbox-installers"
-          aws s3api get-object --bucket thinkbox-installers --key "Deadline/${deadline_version}/Linux/${deadline_linux_installers_filename}" "${deadline_linux_installers_tar}"
+          aws s3api get-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}" "${deadline_installers_tar}"
           # If this doesn't exist in user bucket, upload it for reproducibility (incase the Thinkbox installer becomes unavailable).
           if [[ ! -z "$installers_bucket" ]]; then
             log_info "...Querying if this file exists in $installers_bucket"
-            output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_linux_installers_filename") && exit_status=0 || exit_status=$?
+            output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
             if [[ ! $exit_status -eq 0 ]]; then
-                log_info "Uploading the file to $installers_bucket $deadline_linux_installers_filename"
-                aws s3api put-object --bucket $installers_bucket --key "$deadline_linux_installers_filename" --body "${deadline_linux_installers_tar}"
+                log_info "Uploading the file to $installers_bucket $deadline_installers_filename"
+                aws s3api put-object --bucket $installers_bucket --key "$deadline_installers_filename" --body "${deadline_installers_tar}"
             else
-                log_info "The bucket $installers_bucket already contains: $deadline_linux_installers_filename"
+                log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
             fi
           fi
       else
           printf "\n\nWarning: The installer was not aquired from Thinkbox.  It may have become deprecated.  Other AWS Accounts will not be able to install this version.\n\n"
           if [[ ! -z "$installers_bucket" ]]; then
             log_info "...Downloading from: $installers_bucket"
-            aws s3api get-object --bucket $installers_bucket --key "$deadline_linux_installers_filename" "${deadline_linux_installers_tar}"
+            aws s3api get-object --bucket $installers_bucket --key "$deadline_installers_filename" "${deadline_installers_tar}"
           fi
       fi
   fi
-  sudo mkdir -p $deadline_installer_dir
-  # Extract Installer
-  sudo tar -xvf $deadline_linux_installers_tar -C $deadline_installer_dir
+  if [[ "$extract_installer" == "true" ]]; then
+    log_info "...Extract installler"
+    sudo mkdir -p $deadline_installer_dir
+    # Extract Installer
+    sudo tar -xvf $deadline_installers_tar -C $deadline_installer_dir
+  fi
 
 }
 
@@ -933,7 +937,9 @@ function options { # Not all defaults are available as args, however the script 
   deadline_linux_installers_tar="/tmp/Deadline-${deadline_version}-linux-installers.tar"
   deadline_linux_installers_filename="$(basename $deadline_linux_installers_tar)"
   deadline_linux_installers_basename="${deadline_linux_installers_filename%.*}"
+
   deadline_installer_dir="$download_dir/$deadline_linux_installers_basename"
+  deadline_linux_installer_bucket_key="Deadline/${deadline_version}/Linux/${deadline_linux_installers_filename}"
   # deadline_proxy_certificate_basename="${deadline_proxy_certificate%.*}"
   mongo_installer_tgz="$download_dir/$(basename $mongo_url)"
   deadline_db_installer_filename="DeadlineRepository-${deadline_version}-linux-x64-installer.run"
@@ -950,7 +956,20 @@ function options { # Not all defaults are available as args, however the script 
     if [[ "$skip_download_mongo" == "false" ]]; then
       download_mongo "$mongo_installer_tgz" "$mongo_url"
     fi
-    download_deadline "$deadline_linux_installers_tar" "$deadline_version" "$deadline_linux_installers_filename" "$installers_bucket" "$deadline_installer_dir"
+    # Download for Linux and extract archive
+    download_deadline "$deadline_linux_installers_tar" "$deadline_linux_installer_bucket_key" "$deadline_linux_installers_filename" "$installers_bucket" "$deadline_installer_dir" "true"
+    
+    # Download for Windows (archive file only for convenience and future install)
+    deadline_windows_installers_tar="/tmp/Deadline-${deadline_version}-windows-installers.tar"
+    deadline_windows_installers_filename="$(basename $deadline_windows_installers_tar)"
+    deadline_windows_installer_bucket_key="Deadline/${deadline_version}/Windows/${deadline_windows_installers_filename}"
+    download_deadline "$deadline_windows_installers_tar" "$deadline_windows_installer_bucket_key" "$deadline_windows_installers_filename" "$installers_bucket" "$deadline_installer_dir" "false"
+    
+    # Download for OSX (archive file only for convenience and future install)
+    deadline_osx_installers_tar="/tmp/Deadline-${deadline_version}-osx-installers.tar"
+    deadline_osx_installers_filename="$(basename $deadline_osx_installers_tar)"
+    deadline_osx_installer_bucket_key="Deadline/${deadline_version}/OSX/${deadline_osx_installers_filename}"
+    download_deadline "$deadline_osx_installers_tar" "$deadline_osx_installer_bucket_key" "$deadline_osx_installers_filename" "$installers_bucket" "$deadline_installer_dir" "false"
   fi
   
   # Install DB
