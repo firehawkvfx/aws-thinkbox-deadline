@@ -199,7 +199,7 @@ function download_deadline {
       log_info "File already exists: $deadline_installers_tar"
   else
       # Prefer installation from Thinkbox S3 Bucket for visibility when a version is deprecated.
-      log_info "Get object with: aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}"
+      log_info "Get object with: aws s3api head-object --bucket thinkbox-installers --key ${deadline_installer_bucket_key}"
       output=$(aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "...Downloading Deadline (${deadline_installers_filename}) from: thinkbox-installers"
