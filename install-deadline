@@ -197,6 +197,17 @@ function download_deadline {
       mkdir -p  "$(dirname $deadline_installers_tar)"
   fi
 
+  # If we dont need to extract the installer, and we already have the file in our bucket, we can skip this function.
+  # We just need to ensure that we have the installer for some operating systems that are not linux.
+  if [[ "$extract_installer" == "false"]]; then 
+      log_info "...Querying if this file exists in $installers_bucket"
+      output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
+      if [[ $exit_status -eq 0 ]]; then
+          log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
+          return 0
+      fi
+  fi
+
   if [[ -f "$deadline_installers_tar" ]]; then
       log_info "File already exists: $deadline_installers_tar"
   else
