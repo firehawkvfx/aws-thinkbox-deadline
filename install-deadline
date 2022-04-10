@@ -199,9 +199,10 @@ function download_deadline {
       log_info "File already exists: $deadline_installers_tar"
   else
       # Prefer installation from Thinkbox S3 Bucket for visibility when a version is deprecated.
+      log_info "Get object with: aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}"
       output=$(aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
-          log_info "...Downloading Deadline from: thinkbox-installers"
+          log_info "...Downloading Deadline (${deadline_installers_filename}) from: thinkbox-installers"
           aws s3api get-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}" "${deadline_installers_tar}"
           # If this doesn't exist in user bucket, upload it for reproducibility (incase the Thinkbox installer becomes unavailable).
           if [[ ! -z "$installers_bucket" ]]; then
@@ -960,13 +961,13 @@ function options { # Not all defaults are available as args, however the script 
     download_deadline "$deadline_linux_installers_tar" "$deadline_linux_installer_bucket_key" "$deadline_linux_installers_filename" "$installers_bucket" "$deadline_installer_dir" "true"
     
     # Download for Windows (archive file only for convenience and future install)
-    deadline_windows_installers_tar="/tmp/Deadline-${deadline_version}-windows-installers.tar"
+    deadline_windows_installers_tar="/tmp/Deadline-${deadline_version}-windows-installers.zip"
     deadline_windows_installers_filename="$(basename $deadline_windows_installers_tar)"
     deadline_windows_installer_bucket_key="Deadline/${deadline_version}/Windows/${deadline_windows_installers_filename}"
     download_deadline "$deadline_windows_installers_tar" "$deadline_windows_installer_bucket_key" "$deadline_windows_installers_filename" "$installers_bucket" "$deadline_installer_dir" "false"
     
     # Download for OSX (archive file only for convenience and future install)
-    deadline_osx_installers_tar="/tmp/Deadline-${deadline_version}-osx-installers.tar"
+    deadline_osx_installers_tar="/tmp/Deadline-${deadline_version}-osx-installers.dmg"
     deadline_osx_installers_filename="$(basename $deadline_osx_installers_tar)"
     deadline_osx_installer_bucket_key="Deadline/${deadline_version}/OSX/${deadline_osx_installers_filename}"
     download_deadline "$deadline_osx_installers_tar" "$deadline_osx_installer_bucket_key" "$deadline_osx_installers_filename" "$installers_bucket" "$deadline_installer_dir" "false"
