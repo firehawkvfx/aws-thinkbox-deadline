@@ -202,7 +202,8 @@ function download_deadline {
   # installation for other OS's is possible in the future.
   if [[ "$extract_installer" == "false" ]]; then 
       log_info "...Querying if this file exists in $installers_bucket"
-      log_info "get aws version $(aws --version)"
+      log_info "Get aws version B:"
+      log_info "$(aws --version)"
       output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
@@ -237,7 +238,8 @@ function download_deadline {
   # If this doesn't exist in user bucket, upload it for reproducibility (incase the Thinkbox installer becomes unavailable).
   if [[ "$attempt_upload" == "true" && ! -z "$installers_bucket" ]]; then
       log_info "...Querying if this file exists in $installers_bucket"
-      log_info "get aws version $(aws --version)"
+      log_info "Get aws version A:"
+      log_info "$(aws --version)"
       output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ ! $exit_status -eq 0 ]]; then
           log_info "Uploading the file to $installers_bucket $deadline_installers_filename"
