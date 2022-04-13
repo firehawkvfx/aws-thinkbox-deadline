@@ -202,6 +202,7 @@ function download_deadline {
   # installation for other OS's is possible in the future.
   if [[ "$extract_installer" == "false" ]]; then 
       log_info "...Querying if this file exists in $installers_bucket"
+      log_info "get aws version $(aws --version)"
       output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
@@ -236,6 +237,7 @@ function download_deadline {
   # If this doesn't exist in user bucket, upload it for reproducibility (incase the Thinkbox installer becomes unavailable).
   if [[ "$attempt_upload" == "true" && ! -z "$installers_bucket" ]]; then
       log_info "...Querying if this file exists in $installers_bucket"
+      log_info "get aws version $(aws --version)"
       output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ ! $exit_status -eq 0 ]]; then
           log_info "Uploading the file to $installers_bucket $deadline_installers_filename"
@@ -869,6 +871,7 @@ function options { # Not all defaults are available as args, however the script 
   local skip_install_rcs="false"
   local install_worker="false"
   local skip_install_validation="false"
+  local verbose="false"
 
   while [[ $# > 0 ]]; do
     local key="$1"
@@ -927,6 +930,9 @@ function options { # Not all defaults are available as args, however the script 
       --skip-install-validation)
         skip_install_validation="true"
         ;;
+      --verbose)
+        verbose="true"
+        ;;
       --help)
         print_usage
         exit
@@ -940,6 +946,10 @@ function options { # Not all defaults are available as args, however the script 
 
     shift
   done
+
+  if [[ "$verbose" == "true" ]]; then
+    set -x;
+  fi
 
   assert_not_empty "--deadline-version" "$deadline_version"
   assert_not_empty "--db-host-name" "$db_host_name" # db host name required when installing worker as well for proxyroot dir
