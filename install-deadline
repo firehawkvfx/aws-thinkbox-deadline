@@ -202,11 +202,6 @@ function download_deadline {
   # installation for other OS's is possible in the future.
   if [[ "$extract_installer" == "false" ]]; then 
       log_info "...Querying if this file exists in $installers_bucket"
-      log_info "Get aws version B:"
-      log_info "$(aws --version)"
-      log_info "PATH: $PATH"
-      log_info "ls -ltriah /usr/local/bin/:"
-      ls -ltriah /usr/local/bin/
       output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
@@ -218,10 +213,6 @@ function download_deadline {
       log_info "File already exists: $deadline_installers_tar"
   else
       # Prefer installation from Thinkbox S3 Bucket for visibility when a version is deprecated.
-      log_info "PATH: $PATH"
-      log_info "ls -ltriah /usr/local/bin/:"
-      ls -ltriah /usr/local/bin/
-      log_info "Get object with: aws s3api head-object --bucket thinkbox-installers --key ${deadline_installer_bucket_key}"
       output=$(aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "...Downloading Deadline (${deadline_installers_filename}) from: thinkbox-installers"
@@ -244,11 +235,6 @@ function download_deadline {
   # If this doesn't exist in user bucket, upload it for reproducibility (incase the Thinkbox installer becomes unavailable).
   if [[ "$attempt_upload" == "true" && ! -z "$installers_bucket" ]]; then
       log_info "...Querying if this file exists in $installers_bucket"
-      log_info "Get aws version A:"
-      log_info "$(aws --version)"
-      log_info "PATH: $PATH"
-      log_info "ls -ltriah /usr/local/bin/:"
-      ls -ltriah /usr/local/bin/
       output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ ! $exit_status -eq 0 ]]; then
           log_info "Uploading the file to $installers_bucket $deadline_installers_filename"
