@@ -203,11 +203,11 @@ function download_deadline {
   if [[ "$extract_installer" == "false" ]]; then 
       log_info "...Querying if this file exists in $installers_bucket"
       log_info "Get aws version B:"
-      log_info "$(/usr/local/bin/aws --version)"
+      log_info "$(aws --version)"
       log_info "PATH: $PATH"
       log_info "ls -ltriah /usr/local/bin/:"
       ls -ltriah /usr/local/bin/
-      output=$(/usr/local/bin/aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
+      output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
           return 0
@@ -221,16 +221,16 @@ function download_deadline {
       log_info "PATH: $PATH"
       log_info "ls -ltriah /usr/local/bin/:"
       ls -ltriah /usr/local/bin/
-      log_info "Get object with: /usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key ${deadline_installer_bucket_key}"
-      output=$(/usr/local/bin/aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}") && exit_status=0 || exit_status=$?
+      log_info "Get object with: aws s3api head-object --bucket thinkbox-installers --key ${deadline_installer_bucket_key}"
+      output=$(aws s3api head-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}") && exit_status=0 || exit_status=$?
       if [[ $exit_status -eq 0 ]]; then
           log_info "...Downloading Deadline (${deadline_installers_filename}) from: thinkbox-installers"
-          /usr/local/bin/aws s3api get-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}" "${deadline_installers_tar}"
+          aws s3api get-object --bucket thinkbox-installers --key "${deadline_installer_bucket_key}" "${deadline_installers_tar}"
       else
           printf "\n\nWarning: The installer was not aquired from Thinkbox.  It may have become deprecated.  Other AWS Accounts will not be able to install this version.\n\n"
           if [[ ! -z "$installers_bucket" ]]; then
               log_info "...Downloading from: $installers_bucket"
-              /usr/local/bin/aws s3api get-object --bucket $installers_bucket --key "$deadline_installers_filename" "${deadline_installers_tar}"
+              aws s3api get-object --bucket $installers_bucket --key "$deadline_installers_filename" "${deadline_installers_tar}"
               attempt_upload="false"
           fi
       fi
@@ -245,14 +245,14 @@ function download_deadline {
   if [[ "$attempt_upload" == "true" && ! -z "$installers_bucket" ]]; then
       log_info "...Querying if this file exists in $installers_bucket"
       log_info "Get aws version A:"
-      log_info "$(/usr/local/bin/aws --version)"
+      log_info "$(aws --version)"
       log_info "PATH: $PATH"
       log_info "ls -ltriah /usr/local/bin/:"
       ls -ltriah /usr/local/bin/
-      output=$(/usr/local/bin/aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
+      output=$(aws s3api head-object --bucket $installers_bucket --key "$deadline_installers_filename") && exit_status=0 || exit_status=$?
       if [[ ! $exit_status -eq 0 ]]; then
           log_info "Uploading the file to $installers_bucket $deadline_installers_filename"
-          /usr/local/bin/aws s3api put-object --bucket $installers_bucket --key "$deadline_installers_filename" --body "${deadline_installers_tar}"
+          aws s3api put-object --bucket $installers_bucket --key "$deadline_installers_filename" --body "${deadline_installers_tar}"
       else
           log_info "The bucket $installers_bucket already contains: $deadline_installers_filename"
       fi
