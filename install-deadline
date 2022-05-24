@@ -986,6 +986,7 @@ function options { # Not all defaults are available as args, however the script 
     if [[ "$skip_download_mongo" == "false" ]]; then
       download_mongo "$mongo_installer_tgz" "$mongo_url"
     fi
+    assert_not_empty "--installers-bucket" "$installers_bucket"
     # Download for Linux and extract archive
     download_deadline "$deadline_linux_installers_tar" "$deadline_linux_installer_bucket_key" "$deadline_linux_installers_filename" "$installers_bucket" "$deadline_installer_dir" "true"
     
