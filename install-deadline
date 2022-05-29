@@ -862,6 +862,7 @@ function options { # Not all defaults are available as args, however the script 
   local skip_certgen_during_rcs_install="false"
   local post_certgen_db="false"
   local post_certgen_rcs="false"
+  local configure_path_mapping="false"
   local dbport="$DEFAULT_DBPORT"
   local proxyport="$DEFAULT_PROXYPORT"
   local httpport="$DEFAULT_HTTPPORT"
@@ -923,6 +924,9 @@ function options { # Not all defaults are available as args, however the script 
         ;;
       --post-certgen-rcs)
         post_certgen_rcs="true"
+        ;;
+      --configure-path-mapping)
+        configure_path_mapping="true"
         ;;
       --skip-download-installers)
         skip_download_installers="true"
@@ -1074,7 +1078,9 @@ function options { # Not all defaults are available as args, however the script 
     start_launcher "$dbport" "$proxyport" # TODO we should validate this too
   fi
 
-  $SCRIPTDIR/configure-path-mapping
+  if [[ "$configure_path_mapping" == "true" ]]; then
+    $SCRIPTDIR/configure-path-mapping
+  fi
 }
 
 options "$@"
