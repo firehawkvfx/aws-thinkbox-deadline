@@ -1,0 +1,29 @@
+{
+  "PathMapping": {
+    "Version": 1,
+    "Settings": {
+      "GlobalRules": [
+        {
+          "Path": $map_source_win,
+          "WindowsPath": $map_source_win,
+          "LinuxPath": $map_target_linux,
+          "MacPath": $map_target_linux,
+          "CaseSensitive": false,
+          "RegularExpression": false,
+          "Region": "All"
+        },
+        {
+          "Path": $map_source_win2,
+          "WindowsPath": $map_source_win2,
+          "LinuxPath": $map_target_linux,
+          "MacPath": $map_target_linux,
+          "CaseSensitive": false,
+          "RegularExpression": false,
+          "Region": "All"
+        }
+      ],
+      "SubmissionTimeRules": [],
+      "RecursivelyApplyRules": true
+    }
+  }
+}

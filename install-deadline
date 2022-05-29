@@ -43,6 +43,15 @@ function print_usage {
   echo "  install-deadline --deadline-version 10.1.14.5"
 }
 
+EXECDIR="$(pwd)"
+SOURCE=${BASH_SOURCE[0]} # resolve the script dir even if a symlink is used to this script
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "$SOURCE")
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPTDIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
 function log {
   local -r level="$1"
   local -r message="$2"
@@ -1064,6 +1073,8 @@ function options { # Not all defaults are available as args, however the script 
     start_db_service_and_validate "$dbport"
     start_launcher "$dbport" "$proxyport" # TODO we should validate this too
   fi
+
+  $SCRIPTDIR/configure-path-mapping
 }
 
 options "$@"

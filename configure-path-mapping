@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Configure deadline path mapping for windows to linux
+
+set -e
+
+EXECDIR="$(pwd)"
+SOURCE=${BASH_SOURCE[0]} # resolve the script dir even if a symlink is used to this script
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "$SOURCE")
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPTDIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+cd $SCRIPTDIR
+
+# cleanup
+if test -f /tmp/deadlinedbsettings.json; then
+    rm -fr /tmp/deadlinedbsettings.json
+fi
+
+jq -n --arg map_source_win X:/ \
+    --arg map_source_win2 X:\\ \
+    --arg map_target_linux /Volumes/cloud_prod/ \
+    -f $SCRIPTDIR/template_deadline_settings_path_map.json | jq . > /tmp/deadlinedbsettings.json
+
+/opt/Thinkbox/Deadline10/bin/deadlinecommand ImportRepositorySettings -ImportFilePath /tmp/deadlinedbsettings.json -ImportOperation Replace
+
+cd $EXECDIR
