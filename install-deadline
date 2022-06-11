@@ -828,6 +828,13 @@ function configure_deadline {
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
+  
+  # Ensure valid permissions because Thinkbox dont seem to do this and we get permissions errors ?!?!
+  sudo touch "/var/lib/Thinkbox/Deadline10/hserverAddress"
+  sudo chmod u=rw,g=r,o=rw "/var/lib/Thinkbox/Deadline10/hserverAddress"
+  sudo touch "/var/lib/Thinkbox/Deadline10/launcher.ini"
+  sudo chmod u=rw,g=rw,o=rw "/var/lib/Thinkbox/Deadline10/hserverAddress"
+
   # printf "\nlicense_forwarder: $license_forwarder\n\n"
   # if [[ "$license_forwarder" != "none" ]]; then
   #   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchLicenseForwarderAtStartup=" "1"
