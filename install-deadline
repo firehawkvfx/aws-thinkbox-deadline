@@ -828,11 +828,6 @@ function configure_deadline {
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxySSLCertificate=" "$deadline_client_certificates_location/$deadline_proxy_certificate"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot0=" "$deadline_proxy_root_dir;$deadline_client_certificates_location/$deadline_proxy_certificate"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "NetworkRoot0=" "/opt/Thinkbox/DeadlineRepository10/;$deadline_certificates_location/$deadline_client_certificate"
-  # printf "\nlicense_forwarder: $license_forwarder\n\n"
-  # if [[ "$license_forwarder" != "none" ]]; then
-  #   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchLicenseForwarderAtStartup=" "1"
-  #   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LicenseForwarderSSLPath=" "$license_forwarder"
-  # fi
 }
 
 function configure_auth {
