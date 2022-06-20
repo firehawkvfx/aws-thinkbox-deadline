@@ -819,7 +819,7 @@ function configure_deadline {
 
   # ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "TlsServerCert=" "/opt/Thinkbox/certs//deadlinedb.service.consul.pfx"
   # ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "TlsCaCert=" "/opt/Thinkbox/certs//ca.crt"
-
+  ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "MonitorPythonVersion=" "2"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchPulseAtStartup=" "True"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "LaunchRemoteConnectionServerAtStartup=" "True"
   ensure_value "/var/lib/Thinkbox/Deadline10/deadline.ini" "ProxyRoot=" "$deadline_proxy_root_dir"
