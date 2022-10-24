@@ -380,6 +380,10 @@ function start_launcher {
   local -r dbport="$1"
   local -r proxyport="$2"
 
+  # Fix thinkbox error pointing to incorrect location for bash.
+  replace_line "/etc/systemd/system/deadline10launcher.service" "ExecStart=" "ExecStart=/bin/bash -l -c \"/opt/Thinkbox/Deadline10/bin/deadlinelauncher -daemon -nogui\""
+  sudo systemctl daemon-reload
+
   log_info "...Waiting for DB port: $dbport"
   while ! timeout 1 bash -c "echo > /dev/tcp/localhost/$dbport"; do sleep 10; done # see alternatives https://unix.stackexchange.com/
   sudo service deadline10launcher restart
