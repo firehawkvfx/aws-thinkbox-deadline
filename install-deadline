@@ -382,7 +382,7 @@ function start_launcher {
 
   # Fix thinkbox error pointing to incorrect location for bash.
   echo "Updating location of bash executable pointing at incorrect location.  This change should be disabled once adresses by thinkbox (24 oct 2022)"
-  replace_line "/etc/systemd/system/deadline10launcher.service" "ExecStart=/usr/bin/bash" "ExecStart=/bin/bash -l -c '/opt/Thinkbox/Deadline10/bin/deadlinelauncher -daemon -nogui'"
+  replace_line "/etc/systemd/system/deadline10launcher.service" "ExecStart=/usr/bin/bash" "ExecStart=/usr/bin/env bash -l -c '/opt/Thinkbox/Deadline10/bin/deadlinelauncher -daemon -nogui'"
   sudo cat /etc/systemd/system/deadline10launcher.service
   sudo systemctl daemon-reload
 
