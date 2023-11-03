@@ -429,11 +429,15 @@ function generate_certs_for_db_and_rcs {
 
   cd /home/$deadlineuser_name/Downloads/SSLGeneration
 
+  # See https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/proxy-sslgen.html
+
   # CA
   log_info "...Generate CA"
+  # This will place a 'ca.crt' and 'ca.key' file in the 'keys' sub-directory.
   python ssl_gen.py --ca --cert-org "$cert_org" --cert-ou "$cert_ou"
   # Server Cert
   log_info "...Generate Server Cert"
+  # This will place a '<server name>.crt' and '<server name>.key' file in the 'keys' sub-directory.
   python ssl_gen.py --server --cert-name "$server_cert_basename"
   cat "${ssl_keygen_path}/${server_cert_basename}.crt" "${ssl_keygen_path}/${server_cert_basename}.key" | sudo tee "${ssl_keygen_path}/${server_cert_basename}.pem"
 
